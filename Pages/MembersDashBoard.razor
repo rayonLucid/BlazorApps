@@ -1,0 +1,287 @@
+﻿@page "/MembersDashBoard"
+
+@using Club_Portal.Models
+@inject EventService eService
+@inject LoginService loginService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+
+@layout UserLayout
+ <div class="container-fluid">
+            @if (eventList != null )
+            {
+
+            <ul class="nav flex-row">
+                @foreach (var Eachevent in eventList)
+                {
+                     // RandomColour(); 
+                    string Clubid = @Eachevent.ClubID;
+                       int eventid = @Eachevent.EventID;
+                string UserID = @USERID;
+                <li class=" card nav-item px-3" style="margin:0.1em 0.1em;width:30rem;background-color:rgb(5 22 60);color:white">
+                        <div class="card-body" style="width:stretch">
+
+                          @*  <div class="row form-group">
+                                <label class="col-md-4">ID</label>
+                                <label class="col-md-8" >@Eachevent.ClubID</label>
+
+                            </div>*@
+                            <div class="row form-group">
+                                <label class="col-md-4" >Name</label>
+                                <label class="col-md-8" >@Eachevent.EventName</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Date </label>
+                                <label class="col-md-8" >@Eachevent.EventDate</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Location</label>
+                                <label class="col-md-8" >@Eachevent.EventLocation</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Description</label>
+                                <label class="col-md-8" >@Eachevent.Description</label>
+
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    <input type="button" id="modalEditbutton" data-toggle="modal"   data-target="#editView"  @onclick="()=>Subscribe(UserID,Clubid,eventid)"  value="Subscribe" class="btn btn-block btn-warning" />
+                                </div>
+                               @* <div class="col-md-4">
+                                    <input type="button" value="Delete" @onclick="( async() => await RemoveUser(clubid))" class="btn btn-danger" />
+                                </div>*@
+
+                            </div>
+                        </div>
+
+                    </li>
+                }
+            </ul>
+            <div class="card-footer">
+                @if (buttoncount != 0)
+                {
+                    <ul class="nav flex-row">
+
+                        @for (int x = 0; x <= @buttoncount; x++)
+                        {
+                           // RandomColour();
+                            int i = @x;
+                            int skip = i *6;
+                            string ClubID = @clubID;
+                            if (i == 0)
+                            {
+                           
+                            <li class="nav-item " style="margin:auto 0.1em;background-color:rgb(5 22 60);color:white">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip,ClubID)">First</button>
+                                </li>
+                            }
+                            else if (@buttoncount==@x)
+                            {
+                                 <li class="nav-item " style="margin:auto 0.1em">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip,ClubID)">Last</button>
+                                </li> 
+                            }
+                            else
+                            {
+                                 <li class="nav-item " style="margin:auto 0.1em">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip,ClubID)">@x</button>
+                            </li>
+                            }
+
+
+                        }
+
+                </ul>
+                }
+            </div>
+
+        }
+        else
+        {
+            <div><p>Loading...</p></div>
+        }
+       </div>
+       
+<div class="modal fade draggable scrollbar-auto" id="PaymentViewEventSub" tabindex="-1" role="dialog" aria-hidden="true"> 
+   
+   <div class="modal-dialog " role="document">
+
+       <div class="modal-content" style="width:50rem">
+            <div class="modal-header">
+
+    <h5 class="modal-title">Payment Information</h5>
+    <button type="button" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+    </button>
+  
+
+   </div>
+    <div class="modal-body" >
+        <div class="card-body" style="width:stretch">
+           
+             <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card ">
+                <div class="card-header">
+                    <div class="bg-white shadow-sm pt-4 pl-2 pr-2 pb-2">
+                        <!-- Credit card form tabs -->
+                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
+                            <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <img src="https://img.icons8.com/color/25/000000/bank-cards.png" /> Credit Card </a> </li>
+                            <li class="nav-item"> <a data-toggle="pill" href="#paypal" class="nav-link "> <img src="https://img.icons8.com/color/28/000000/paypal.png" /> Paypal </a> </li>
+                            <li class="nav-item"> <a data-toggle="pill" href="#net-banking" class="nav-link "> <img src="https://img.icons8.com/color/28/000000/mobile-payment.png" /> Net Banking </a> </li>
+                        </ul>
+                    </div> <!-- End -->
+                    <!-- Credit card form content -->
+                    <div class="tab-content">
+                        <!-- credit card info-->
+                        <div id="credit-card" class="tab-pane fade show active pt-3">
+                            <form role="form" onsubmit="event.preventDefault()">
+                                <div class="form-group">
+                                    <label for="username">
+                                        <label>Card Owner</label>
+                                    </label> <input type="text" name="username" placeholder="Card Owner Name" required class="form-control ">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardNumber">
+                                        <label>Card number</label>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" name="cardNumber" placeholder="Valid card number" class="form-control " required>
+                                        <div class="input-group-append"> <span class="input-group-text text-muted"><img src="https://img.icons8.com/color/24/000000/visa.png" /> <img src="https://img.icons8.com/color/24/000000/mastercard.png" /> <img src="https://img.icons8.com/color/28/000000/amex.png" /> </span> </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label>
+                                                <span class="hidden-xs">
+                                                    <label>Expiration Date</label>
+                                                </span>
+                                            </label>
+                                            <div class="input-group"> <input type="number" max="2" placeholder="MM" name="" class="form-control" required> <input type="number" max="2" placeholder="YY" name="" class="form-control" required> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group mb-4">
+                                            <label data-toggle="tooltip" title="Three digit CV code on the back of your card">
+                                                <label>CVV <i class="fa fa-question-circle d-inline"></i></label>
+                                            </label> <input type="text" maxlength="3" required class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer" /> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm"> Confirm Payment </button>
+                            </form>
+                        </div>
+                    </div> <!-- End -->
+                    <!-- Paypal info -->
+                    <div id="paypal" class="tab-pane fade pt-3">
+                        <label class="pb-2">Select your paypal account type</label>
+                        <div class="form-group "> <label class="radio-inline"> <input type="radio" name="optradio" checked> Domestic </label> <label class="radio-inline"> <input type="radio" name="optradio" class="ml-5">International </label></div>
+                        <p> <button type="button" class="btn btn-primary "><i class="fab fa-paypal mr-2"></i> Log into my Paypal</button> </p>
+                        <p class="text-muted"> Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                    </div> <!-- End -->
+                    <!-- bank transfer info -->
+                    <div id="net-banking" class="tab-pane fade pt-3">
+                        <div class="form-group ">
+                            <label for="Select Your Bank">
+                                <h5>Select your Bank</h5>
+                            </label> <select class="form-control" id="ccmonth">
+                                <option value="" selected disabled>--Please select your Bank--</option>
+                                <option>Bank 1</option>
+                                <option>Bank 2</option>
+                                <option>Bank 3</option>
+                                <option>Bank 4</option>
+                                <option>Bank 5</option>
+                                <option>Bank 6</option>
+                                <option>Bank 7</option>
+                                <option>Bank 8</option>
+                                <option>Bank 9</option>
+                                <option>Bank 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i> Proceed Payment</button> </p>
+                        </div>
+                        <p class="text-muted">Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                    </div> <!-- End -->
+                    <!-- End -->
+                </div>
+            </div>
+        </div>
+    </div>
+                
+          
+           
+        </div>
+       
+                
+            </div>
+   </div>
+   <div class="modal-footer">
+       <button class="btn btn-primary btn-outline-warning" data-dismiss="modal" >Pay</button>
+   </div>
+   </div>
+   </div>
+ 
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    AllEventSubs vevent = new AllEventSubs();
+    int clubcount ;
+    IEnumerable<AllEventSubs> eventList;
+    int clubCount = 0;
+    string clubID  , USERID ;
+    int buttoncount = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        var  clubid =await  storage.GetAsync<string>("ClubID");
+        var   userid =   await  storage.GetAsync<string>("UserID");
+        clubID = clubid.Value;
+        USERID = userid.Value;
+        eventList =  await Task.Run(()=>  eService.GetEvents(0,clubID));
+        clubCount = eventList.Count();
+        buttoncount = clubCount / 6;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        await JSRuntime.InvokeVoidAsync("loadControls");
+        await JSRuntime.InvokeVoidAsync("CallChatWidget");
+        //StateHasChanged();
+        
+        base.OnAfterRender(firstRender);
+    }
+  
+    private async Task Subscribe(string UserID,string clubid,int eventid)
+    {
+        bool confirm =   await JSRuntime.InvokeAsync<bool>("confirm", "You will have to make payments before you can subscribe to this event \n Would you like to Continue?");
+        if (confirm)
+        {
+              await JSRuntime.InvokeVoidAsync("ShowPaymentModal");
+
+
+        //     bool result = eService.Event_Subscribe(UserID, clubid, eventid);
+        //if (result)
+        //{
+        //      await JSRuntime.InvokeVoidAsync("alert", " You have Successfully Subscribed to this Event");
+        //}
+
+        }
+        else
+        {
+            return;
+        }
+
+    
+    }
+    private void getRecord(int value,string clubID)
+    {
+        eventList =  eService.GetEvents(value,clubID);
+         clubcount = eventList.Count();
+    }
+    
+   
+}

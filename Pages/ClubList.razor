@@ -1,0 +1,237 @@
+﻿@page "/ClubList"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+
+
+<div class="form-group">
+
+   <div class="row">
+        <ul class="nav flex-row">
+            <li class="nav-item px-3">
+           <h4>Club List</h4>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="Clubs" Match="NavLinkMatch.All">
+                <span class="oi  oi-arrow-thick-left" aria-hidden="true"></span> Back 
+            </NavLink>
+        </li>
+        </ul>
+   </div>
+   <div class="container-fluid">
+            @if (clubList != null )
+            {
+
+            <ul class="nav flex-row">
+                @foreach (var EachClub in clubList)
+                {
+                     // RandomColour(); 
+                    string clubid = @EachClub.ClubID;
+
+                    <li class=" card nav-item px-3" style="margin:0.1em 0.1em;width:stretch;background-color:rgb(5 22 60);color:white">
+                        <div class="card-body" style="width:stretch">
+
+                            <div class="row form-group">
+                                <label class="col-md-4">ID</label>
+                                <label class="col-md-8" >@EachClub.ClubID</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Name</label>
+                                <label class="col-md-8" >@EachClub.ClubName</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Phone </label>
+                                <label class="col-md-8" >@EachClub.PhoneNumber</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Email</label>
+                                <label class="col-md-8" >@EachClub.Email</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Active</label>
+                                <label class="col-md-8" >@EachClub.IsActive</label>
+
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    <input type="button" id="modalEditbutton" data-toggle="modal"   data-target="#editView"  @onclick="()=>EditUser(clubid)"  value="Edit" class="btn btn-warning" />
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="button" value="Delete" @onclick="( async() => await RemoveUser(clubid))" class="btn btn-danger" />
+                                </div>
+
+
+
+
+
+                            </div>
+                        </div>
+
+                    </li>
+                }
+            </ul>
+            <div class="card-footer">
+                @if (buttoncount != 0)
+                {
+                    <ul class="nav flex-row">
+
+                        @for (int x = 0; x <= @buttoncount; x++)
+                        {
+                           // RandomColour();
+                            int i = @x;
+                            int skip = i *6;
+                           
+                            if (i == 0)
+                            {
+                                <li class="nav-item " style="margin:auto 0.1em;background-color:@BackgroundColor">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip)">First</button>
+                                </li>
+                            }
+                            else if (@buttoncount==@x)
+                            {
+                                 <li class="nav-item " style="margin:auto 0.1em">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip)">Last</button>
+                                </li> 
+                            }
+                            else
+                            {
+                                 <li class="nav-item " style="margin:auto 0.1em">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip)">@x</button>
+                            </li>
+                            }
+
+
+                        }
+
+                </ul>
+                }
+            </div>
+
+        }
+        else
+        {
+            <div><p>Loading...</p></div>
+        }
+       </div>
+</div>
+<div class="modal fade" id="editView" tabindex="-1" role="dialog" aria-hidden="true"> 
+   
+   <div class="modal-dialog " role="document">
+
+       <div class="modal-content bg-primary" style="width:fit-content">
+           
+           <div class="modal-header">
+    <h5 class="modal-title">Edit Club Information</h5>
+    <button type="button" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+    </button>
+   </div>
+
+    <div class="modal-body" >
+        <div class="card-body" style="width:stretch">
+            <div class ="row form-group">
+                <label>Club Name</label>
+                <input @bind="clubs.ClubName" class="form-control" />
+            </div>
+             <div class ="row form-group">
+                <label>Club Phone</label>
+                <input @bind="clubs.PhoneNumber" class="form-control" />
+            </div>
+             <div class ="row form-group">
+                <label>Club Email</label>
+                <input @bind="clubs.Email" class="form-control" />
+            </div>
+             <div class ="row form-group">
+                <label>Club Is Active  <input type="checkbox" @bind="clubs.IsActive" class="custom-checkbox" style="margin:0.1em 0.5em;transform-box:border-box;transform:scale(2)" /></label>
+               
+            </div>
+        </div>
+
+   </div>
+   <div class="modal-footer">
+       <button class="btn btn-primary btn-outline-warning" @onclick="(async() => await  SaveUser(clubs))">Save Changes</button>
+   </div>
+   </div>
+   </div>
+</div>
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    ClubInformation clubs = new ClubInformation();
+    int clubcount ;
+    IEnumerable<ClubInformation> clubList;
+    int clubCount = 0;
+    int buttoncount = 0;
+    private string BackgroundColor="transparent";
+    protected override async Task OnInitializedAsync()
+    {
+
+        clubList =  await Task.Run(()=> userService.GetAllClubs());
+        clubCount = clubList.Count();
+        buttoncount = clubCount / 6;
+    
+        clubList =  userService.GetClubs(0);
+    }
+    protected async Task RemoveUser(string userID)
+    {
+        bool deleted = false;
+        deleted =  await Task.Run(()=> userService.DeleteUser(userID));
+        if (deleted)
+        {
+            await JSRuntime.InvokeVoidAsync("alert","Record Successfully Deleted"); 
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert","Record Not Deleted"); 
+        }
+    }
+    private void getRecord(int value)
+    {
+        clubList =  userService.GetClubs(value);
+         clubcount = clubList.Count();
+    }
+  
+   
+    protected void RandomColour()
+
+    {
+
+        var random = new Random();
+
+        var color = String.Format("#{0:X6}", random.Next(0x1000000));
+
+        BackgroundColor = color;
+
+    }
+    private async  Task SaveUser(ClubInformation clubs)
+    {
+        string result =   userService.AddClub(clubs);
+        if(result == "Successfull")
+        {
+            await JSRuntime.InvokeVoidAsync("alert","Record Successfully Created");
+
+        }
+        else
+        {
+                await JSRuntime.InvokeVoidAsync("alert",result);
+        }
+
+    }
+    void EditUser(string clubid)
+    {
+        clubs =   userService.GetActiveClubsInfo(clubid).FirstOrDefault();
+        if (clubs != null)
+        {
+            
+        }
+
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("Users");
+    }
+}

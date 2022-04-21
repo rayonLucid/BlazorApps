@@ -1,0 +1,112 @@
+﻿@page "/MembersList"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+ <div class="row">
+        <ul class="nav flex-row">
+            <li class="nav-item px-3">
+           <h4>Members List</h4>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="Members" Match="NavLinkMatch.All">
+                <span class="oi  oi-arrow-thick-left" aria-hidden="true"></span> Back 
+            </NavLink>
+        </li>
+        </ul>
+</div>
+<div class="form-group">
+ 
+    <table class="table table-hover table-light">
+        <thead class="bg-primary">
+            <tr>
+                <th>Name</th>
+             
+            
+                <th>Address</th>
+            
+                <th>Phone Number</th>
+           
+               <th>E-mail</th>
+            
+             <th>Is Active</th>
+              <th></th>
+               <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (userList != null)
+            {
+                @foreach (var EachUser in userList)
+                {
+                    string userid = EachUser.UserID;
+                    <tr>
+
+                        <td>@EachUser.FirstName</td>
+
+
+                        <td>@EachUser.Address</td>
+
+
+                        <td>@EachUser.PhoneNumber</td>
+
+
+                        <td>@EachUser.Email</td>
+
+
+                        <td>@EachUser.IsActive</td>
+                        <td>
+                            @if (@EachUser.FirstName != "Master")
+                            {
+                              //  string userid = EachUser.UserID;
+                                <input type="submit" value="Delete" @onclick="(async () => await RemoveUser(userid))" class="btn btn-danger" />
+                            }
+                        </td>
+                        <td>  <input type="button" value="Edit" @onclick="(() => EditUser(userid))" class="btn btn-warning" /></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td>Loading...</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+   
+   
+</div>
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    UserInformation user = new UserInformation();
+    IEnumerable<UserInformation> userList;
+    protected override async Task OnInitializedAsync()
+    {
+        var  clubid = await storage.GetAsync<string>("ClubID");
+        userList =  await Task.Run(()=> userService.GetAllMembers(clubid.Value));
+
+    }
+   
+    protected async Task RemoveUser(string userID)
+    {
+        bool deleted = false;
+        deleted =  await Task.Run(()=> userService.DeleteUser(userID));
+        if (deleted)
+        {
+              await JSRuntime.InvokeVoidAsync("alert","Record Successfully Deleted"); 
+        }
+        else
+        {
+              await JSRuntime.InvokeVoidAsync("alert","Record Not Deleted"); 
+        }
+    }
+    async void EditUser(string userid)
+    {
+   await JSRuntime.InvokeVoidAsync("alert",userid); 
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("Members");
+    }
+}

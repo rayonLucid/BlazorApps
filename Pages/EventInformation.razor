@@ -1,0 +1,210 @@
+﻿@page "/EventInformation"
+@using Club_Portal.Models
+@inject EventService eService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+
+<div class="row form-group">
+    <ul class="nav flex-row">
+        <li class="nav-item px-3">
+              <button type="button"  data-toggle="modal" data-target="#MemberListView" class="btn-link btn" @onclick="(async()=>await LoadEvent())">
+                <span class="oi  oi-list-rich" aria-hidden="true"></span> View All Event List
+            </button>
+           
+        </li>
+         <li class="nav-item px-3">
+              <button type="button"  data-toggle="modal" data-target="#MemberListView" class="btn-link btn" @onclick="(async()=>await LoadActiveEvent())">
+                <span class="oi  oi-list-rich" aria-hidden="true"></span> View Active Event List
+            </button>
+           
+        </li>
+         <li class="nav-item px-3">
+              <button type="button"  data-toggle="modal" data-target="#MemberListView" class="btn-link btn" @onclick="(async()=>await LoadExpiredEvent())">
+                <span class="oi  oi-list-rich" aria-hidden="true"></span> View Expired Event List
+            </button>
+           
+        </li>
+    </ul>
+</div>
+<h3 class="text-center">Event's Information</h3>
+<hr class="text-black-50" style="border-bottom:0.2em black solid;margin-bottom:0.5em"/>
+<form>
+    <div class="container-fluid" style="width:fit-content;elevation:above;box-sizing:border-box">
+        <div class="row form-group">
+            <div class="col-md-12">
+                 <label>Name</label>
+        <input type="text" class=form-control disabled="@IsDisabled" id="userID" @bind="events.EventName" />
+
+            </div>
+              
+        </div>
+        <div class="row form-group">
+              <div class="col-md-6">
+              <label>Location</label>
+        <input type="text" class=form-control id="FirstName" @bind="events.Location" />
+        </div>
+          <div class="col-md-6">
+                <label>Date</label>
+        <input type="date" class="form-control" autocomplete="off" id="eventdate" @bind="events.EventDate" />
+              
+          </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-12">
+                     <label>Time</label>
+                    
+        <input type="text" class="form-control timepicker" autocomplete="off"  id="eventtime" @bind="events.EventTime" />
+            
+        </div>
+         <div class="col-md-12">
+               <label>Description</label>
+        <textarea   class=form-control id="Phone" @bind="events.Description" />
+         </div>
+        </div>
+         <div class="row form-group" style="display:none;">
+              <div class="col-md-6">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" @bind="events.EventName" />
+             </div>
+             
+             <div class="col-md-6">
+                 <label>Password</label>
+    
+             </div>
+        </div>
+        <div class="row form-group" style="display:none;">
+             <div class="col-md-6">
+                       </div>
+            <div class="col-md-6">
+              
+           </div>
+        </div>
+         <div class="row form-group">
+             <button type="button" class="btn btn-block btn-primary" @onclick="() =>SaveUser(events)">Save</button>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="MemberListView" tabindex="-1" role="dialog" aria-hidden="true"> 
+   
+   <div class="modal-dialog " role="document">
+
+       <div class="modal-content" style="width:50rem" >
+            <div class="modal-header" style="background-color:aliceblue">
+
+    <h5 class="modal-title">Event  List</h5>
+    <button type="button" @onclick="(async()=>await LoadMembers())" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+    </button>
+  
+
+   </div>
+    <div class="modal-body table-responsive" >
+        <div class="card-body " >
+           <table class="table table-bordered">
+               <thead style="background-color:Highlight">
+                   <tr>
+                       <th>Name</th>
+                        <th>Location</th>
+                         <th>Event Date</th>
+                          <th>Time</th>
+                           <th></th>
+                   </tr>
+               </thead>
+                @if (eventlist != null )
+            {
+               <tbody>
+                    @foreach (var Eachevent in eventlist)
+                {
+                                    int eventid = Eachevent.ID;
+                                    string evdate =@Eachevent.EventDate.Value.Day +"/"+@Eachevent.EventDate.Value.Month +"/"+@Eachevent.EventDate.Value.Year;
+                                    <tr>
+                       <td>@Eachevent.EventName  </td>
+                        <td>@Eachevent.Location</td>
+                         <td>@evdate</td>
+                          <td>@Eachevent.EventTime</td>
+                          <td>
+                               <input type="button" id="modalEditbutton"  data-dismiss="modal"  @onclick="()=>EditEvent(eventid)"  value="Edit" class="btn btn-warning" />
+                            
+                          </td>
+                   </tr>
+                }
+               </tbody>
+            }
+           </table>
+        </div>
+
+   </div>
+   <div class="modal-footer">
+       
+   </div>
+   </div>
+   </div>
+</div>
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    IEnumerable<Events> eventlist { get; set; }
+    string userResult =string.Empty  ;
+    string ClubID =string.Empty  ;
+    string ClubName =string.Empty  ;
+    bool IsDisabled = false;
+    Events events = new Events();
+    public async void SaveUser(Events newevent)
+    {
+        var  clubid = await  storage.GetAsync<string>("ClubID");
+        newevent.ClubID = clubid.Value;
+        userResult = eService.AddEvent(newevent);
+
+        if(!string.IsNullOrEmpty(userResult) && userResult=="Successfull"){ 
+            await JSRuntime.InvokeVoidAsync("alert","Record Successfully Created"); 
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert",userResult);
+        }
+
+    }
+    private void EditEvent(int userid)
+    {
+        // IsDisabled = true;
+        events =   eService.GetEventInfo(userid).FirstOrDefault();
+    }
+    private async Task LoadEvent()
+    {
+         var  clubnameid = await  storage.GetAsync<string>("ClubName");
+        var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        eventlist =   await Task.Run(()=> eService.GetAllEvents(clubid.Value));
+    }
+    private async Task LoadActiveEvent()
+    {
+         var  clubnameid = await  storage.GetAsync<string>("ClubName");
+        var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        eventlist =   await Task.Run(()=> eService.GetNewEventInfo(clubid.Value));
+    }
+    private async Task LoadExpiredEvent()
+    {
+         var  clubnameid = await  storage.GetAsync<string>("ClubName");
+        var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        eventlist =   await Task.Run(()=> eService.GetExpiredEventInfo(clubid.Value));
+    }
+    private async Task LoadMembers()
+    {
+        var  clubnameid = await  storage.GetAsync<string>("ClubName");
+        var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        eventlist =   await Task.Run(()=> eService.GetAllEvents(clubid.Value));
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        var  clubnameid = await  storage.GetAsync<string>("ClubName");
+        var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        await JSRuntime.InvokeVoidAsync("loadControls");
+        ClubID = clubid.Value;
+        eventlist =   await Task.Run(()=> eService.GetAllEvents(clubid.Value));
+    }
+}
+

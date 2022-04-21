@@ -1,0 +1,105 @@
+﻿@page "/Index"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+<section class="container-fluid">
+    @if (@UserName == "MASTER")
+    {
+        <div class="row form-group ">
+            <div class="col-md-3 card bg-success" style="margin:1em 1em">
+                <label class="text-center">No of Registerd Clubs</label>
+                <h4 class="text-center">
+                    <span class="oi oi-list" aria-hidden="true"></span>
+                    @AllclubCount</h4>
+            </div>
+            <div class="col-md-3 card bg-info" style="margin:1em 1em">
+                <label class="text-center">No of Active Clubs</label>
+                <h4 class="text-center">
+                    <span class="oi oi-active" aria-hidden="true"></span>
+                    @ActiveclubCount</h4>
+            </div>
+            <div class="col-md-3 card bg-warning" style="margin:1em 1em">
+                <label class="text-center">No of In-Active Clubs</label>
+                <h4 class="text-center">
+                    <span class="oi oi-basket" aria-hidden="true"></span>
+                    @InActiveclubCount</h4>
+            </div>
+        </div>
+    }
+    else
+    {
+         <div class="row form-group ">
+            <div class="col-md-3 card bg-success" style="margin:1em 1em">
+                <label class="text-center">No of Registerd Members</label>
+                <h4 class="text-center">
+                    <span class="oi oi-list" aria-hidden="true"></span>
+                    @AllMembersCount</h4>
+            </div>
+            <div class="col-md-3 card bg-info" style="margin:1em 1em">
+                <label class="text-center">No of Active Members</label>
+                <h4 class="text-center">
+                    <span class="oi oi-list" aria-hidden="true"></span>
+                    @ActiveMembersCount</h4>
+            </div>
+            <div class="col-md-3 card bg-warning" style="margin:1em 1em">
+                <label class="text-center">No of In-Active Members</label>
+                <h4 class="text-center">
+                    <span class="oi oi-basket" aria-hidden="true"></span>
+                    @InActiveMembersCount</h4>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    ClubInformation clubs = new ClubInformation();
+   
+    string UserName = string.Empty;
+    int InActiveclubCount = 0; 
+    int AllclubCount = 0;
+     int ActiveclubCount = 0;
+      int InActiveMembersCount = 0; 
+    int AllMembersCount = 0;
+     int ActiveMembersCount = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        var  userid = await storage.GetAsync<string>("UserName");
+        UserName = userid.Value;
+        if(UserName =="MASTER"){
+            var  clubid = await storage.GetAsync<string>("ClubID");
+
+            ActiveclubCount =  await Task.Run(()=> userService.GetActiveClubs(clubid.Value));
+            InActiveclubCount =  await Task.Run(()=> userService.GetInActiveClubs(clubid.Value));
+            AllclubCount =  await Task.Run(()=> userService.GetAllCountClubs());
+        }
+        else
+        {
+             var  clubid = await storage.GetAsync<string>("ClubID");
+             ActiveMembersCount =  await Task.Run(()=> userService.GetActiveMembers(clubid.Value));
+            InActiveMembersCount =  await Task.Run(()=> userService.GetInActivenenbers(clubid.Value));
+            AllMembersCount =  await Task.Run(()=> userService.GetAllMembersCount(clubid.Value));
+        }
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+
+    //        var  clubid = await storage.GetAsync<string>("ClubID");
+    //        if (!string.IsNullOrEmpty(clubid.Value))
+    //        {
+
+    //            ActiveclubCount =  await Task.Run(()=> userService.GetActiveClubs(clubid.Value));
+    //            InActiveclubCount =  await Task.Run(()=> userService.GetInActiveClubs(clubid.Value));
+    //            AllclubCount =  await Task.Run(()=> userService.GetAllCountClubs());
+    //        }
+    //        StateHasChanged();
+    //    }
+    //    base.OnAfterRender(firstRender);
+    //}
+}
+
+

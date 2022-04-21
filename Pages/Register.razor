@@ -1,0 +1,140 @@
+﻿@page "/Register"
+@using Club_Portal.Models
+@using Microsoft.AspNetCore.WebUtilities
+@inject UserService userService
+@inject LoginService loginService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+
+
+@layout NewLayout
+<div class="container-fluid" >
+   
+   <form style="margin:1em 1em;">
+
+    <div class="container-fluid" style="width:40rem;padding:2em">
+        <div class="row form-group">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+              <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi  oi-arrow-thick-left" aria-hidden="true"></span> Login
+            </NavLink>
+           
+        </li>
+    </ul>
+</div>
+        <hr class="text-black-50" style="border-bottom:0.1em black solid;margin-bottom:1em"/>
+         <h3>Enter Club's Information</h3>
+<hr class="text-black-50" style="border-bottom:0.1em black solid;margin-bottom:4em"/>
+        <div class="row form-group" >
+            <div class="col-md-6">
+                 <label>Club ID</label>
+        <input type="text" autocomplete="off" class=form-control id="ClubID" @bind="clubs.ClubID" />
+
+            </div>
+               <div class="col-md-6">
+                    <label>Club name</label>
+        <input type="text" autocomplete="off" class=form-control id="ClubName" @bind="clubs.ClubName" />
+                  @*  <label>Club name</label>
+        <select  class=form-control id="ClubID" ><option>--Select Club Name--</option> </select>*@
+               </div>
+        </div>
+        <div class="row form-group">
+              <div class="col-md-6">
+             
+        </div>
+          <div class="col-md-6">
+               @* <label>Surname</label>
+        <input type="text" class=form-control id="Surname" />
+              *@
+          </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-6">
+                     <label>Email</label>
+        <input type="text" autocomplete="off"  class=form-control id="Email" @bind="clubs.Email" />
+             
+        </div>
+         <div class="col-md-6">
+               <label>Phone Number</label>
+        <input type="text" autocomplete="off" class=form-control id="Phone" @bind="clubs.PhoneNumber" />
+         </div>
+        </div>
+         <div class="row form-group">
+            @*  <div class="col-md-6">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" />
+             </div>
+             
+             <div class="col-md-6">
+                 <label>Password</label>
+        <input type="password" class=form-control id="Password" />
+             </div>*@
+        </div>
+        <div class="row form-group" >
+             <div class="col-md-12">
+                  <label>  Description  </label>
+            <textarea rows=2 cols=4 class="form-control" @bind="clubs.Description"></textarea>
+           </div>
+            
+        </div>
+         <div class="row form-group">
+             <button type="button" class="btn btn-block btn-warning" @onclick="()=>SaveClub(clubs)">Save</button>
+        </div>
+    </div>
+</form>
+
+       
+           
+  
+  
+  
+</div>
+  
+
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    IEnumerable<ClubInformation> Clubs { get; set; }
+    UserInformation userResult  = new UserInformation();
+    UserInformation user = new UserInformation();
+    IEnumerable<ClubInformation> clubList { get; set; }
+    string clubResult  = string.Empty,ClubID =string.Empty ;
+    ClubInformation clubs = new ClubInformation();
+    string result = string.Empty;
+    string  DisplayClubInfo = "flex";
+    string     DisplayClubAdminInfo = "none";
+    ClubInformation clubsInfo = new ClubInformation();
+
+    public async void SaveClub(ClubInformation clubInformation)
+    {
+
+        clubResult = loginService.AddClubs(clubInformation);
+
+        if(!string.IsNullOrEmpty(clubResult) && clubResult=="Success"){
+            await  storage.SetAsync("ClubID", clubInformation.ClubID);
+            var  clubid = await storage.GetAsync<string>("ClubID");
+            if(clubid.Value.Length != 0)
+           {
+
+    
+                NavigationManager.NavigateTo("/RegisterClubAdmin");
+            }
+
+
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert",clubResult); 
+        }
+
+    }
+    //protected  override void  OnInitialized()
+    //{
+
+       
+    //}
+
+
+
+   
+    }

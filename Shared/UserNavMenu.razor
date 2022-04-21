@@ -1,0 +1,103 @@
+﻿@using Club_Portal.Models
+@inject UserService userService
+@inject ProtectedSessionStorage storage
+
+<div class="top-row pl-4 navbar navbar-dark">
+    @if (@clubResult != null)
+    {
+        <a class="navbar-brand" href="/ClubMemberLogin">@clubResult.ClubName</a>
+    }
+    else
+    {
+         <a class="navbar-brand" href="">DEFAULT CLUB</a>
+
+    }
+
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="oi ui-button"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+         <li class="nav-item px-3">
+            <NavLink class="nav-link" href="/MembersDashBoard" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> All Events
+            </NavLink>
+        </li>
+        
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="MyEvents" Match="NavLinkMatch.All">
+                <span class="oi oi-people" aria-hidden="true"></span>My Events
+            </NavLink>
+            </li> 
+            @*  <li class="nav-item px-3">
+                <NavLink class="nav-link" href="EventInformation" Match="NavLinkMatch.All">
+                <span class="oi oi-people" aria-hidden="true"></span> Setup Events
+            </NavLink>
+        </li>*@
+             <li class="nav-item px-3">
+                <NavLink class="nav-link" href="Members" Match="NavLinkMatch.All">
+                <span class="oi oi-british-pound" aria-hidden="true"></span> My Payment Details
+            </NavLink>
+        </li>
+      
+         <li class="nav-item px-3">
+            <NavLink class="nav-link" href="Clubs" Match="NavLinkMatch.All">
+                <span class="oi oi-person" aria-hidden="true"></span> Profile
+            </NavLink>
+        </li>
+        @* <li class="nav-item px-3">
+            <NavLink class="nav-link" href="PaymentList" Match="NavLinkMatch.All">
+                <span class="oi oi-british-pound" aria-hidden="true"></span> Payment List
+            </NavLink>
+        </li>*@
+          
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    IEnumerable<UserInformation> users { get; set; }
+    UserInformation userResult { get; set; }
+    ClubInformation clubResult { get; set; }
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    protected  override async Task OnInitializedAsync()
+    {
+        var  user = await storage.GetAsync<string>("UserID");
+        var  clubid = await storage.GetAsync<string>("ClubID");
+        if (!string.IsNullOrEmpty(user.Value))
+        {
+            userResult = await Task.Run(()=>userService.GetUserData(user.Value).FirstOrDefault());
+            clubResult = userService.GetActiveClubsInfo(clubid.Value).FirstOrDefault();
+            if (clubResult != null)
+            {
+                await  storage.SetAsync("ClubName", clubResult.ClubName);
+            }
+
+        }
+      
+    
+
+    }  
+    
+    //  protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        var  user = await storage.GetAsync<string>("UserID");
+       
+    //    if (!string.IsNullOrEmpty(user.Value))
+    //    {
+    //        //  userResult = await Task.Run(()=>userService.GetUserData(user.Value).FirstOrDefault());
+    //    }
+    //     StateHasChanged();
+    //    }
+    //    base.OnAfterRender(firstRender);
+    //}
+}

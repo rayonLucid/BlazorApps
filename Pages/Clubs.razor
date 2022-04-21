@@ -1,0 +1,99 @@
+﻿@page "/Clubs"
+@using Club_Portal.Models
+@inject LoginService loginService
+@inject NavigationManager NavigationManager
+<div class="row form-group">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+              <NavLink class="nav-link" href="ClubList" Match="NavLinkMatch.All">
+                <span class="oi  oi-list-rich" aria-hidden="true"></span> View Club List
+            </NavLink>
+           
+        </li>
+    </ul>
+</div>
+<h3>Clubs</h3>
+<hr class="text-black-50" style="border-bottom:0.1em black solid;margin-bottom:1em"/>
+<form style="margin:1em 1em">
+    <div class="container-fluid">
+        <div class="row form-group">
+            <div class="col-md-6">
+                 <label>Club ID</label>
+        <input type="text" class=form-control id="ClubID" @bind="clubs.ClubID" />
+
+            </div>
+               <div class="col-md-6">
+                    <label>Club name</label>
+        <input type="text" class=form-control id="ClubName" @bind="clubs.ClubName" />
+                  @*  <label>Club name</label>
+        <select  class=form-control id="ClubID" ><option>--Select Club Name--</option> </select>*@
+               </div>
+        </div>
+        <div class="row form-group">
+              <div class="col-md-6">
+             
+        </div>
+          <div class="col-md-6">
+               @* <label>Surname</label>
+        <input type="text" class=form-control id="Surname" />
+              *@
+          </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-6">
+                     <label>Email</label>
+        <input type="text" class=form-control id="Email" @bind="clubs.Email" />
+             
+        </div>
+         <div class="col-md-6">
+               <label>Phone Number</label>
+        <input type="text" class=form-control id="Phone" @bind="clubs.PhoneNumber" />
+         </div>
+        </div>
+         <div class="row form-group">
+            @*  <div class="col-md-6">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" />
+             </div>
+             
+             <div class="col-md-6">
+                 <label>Password</label>
+        <input type="password" class=form-control id="Password" />
+             </div>*@
+        </div>
+        <div class="row form-group">
+             <div class="col-md-6">
+                  <label>Is Active  <input type="checkbox" @bind="clubs.IsActive" id="isActive" style="transform:scale(2);margin:1em 1em" /></label>
+             @*  <label>Is Admin  <input type="checkbox" id="isAdmin" style="transform:scale(2);margin:1em 1em" /></label>*@
+           </div>
+            <div class="col-md-6">
+              
+           </div>
+        </div>
+         <div class="row form-group">
+             <button type="button" class="btn btn-block btn-primary" @onclick="()=>SaveClub(clubs)">Save</button>
+        </div>
+    </div>
+</form>
+@code {
+      [Inject] IJSRuntime JSRuntime { get; set; }
+    IEnumerable<ClubInformation> clubList { get; set; }
+    string clubResult  = string.Empty ;
+    ClubInformation clubs = new ClubInformation();
+    public async void SaveClub(ClubInformation clubInformation)
+    {
+       
+            clubResult = loginService.AddClubs(clubInformation);
+            // await JSRuntime.InvokeVoidAsync("AlertUsernamePassword");
+            // base.OnAfterRender(firstRender);
+            if(!string.IsNullOrEmpty(clubResult) && clubResult=="Success"){
+                    await JSRuntime.InvokeVoidAsync("alert"," Record Created Successfully");
+                    return;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert",clubResult); 
+            }
+       
+    }
+}

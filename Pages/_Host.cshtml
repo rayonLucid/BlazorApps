@@ -1,0 +1,172 @@
+﻿@page "/"
+@namespace Club_Portal.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Club-Portal</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="~/css/bootstrap/bootstrap.min.css" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/css/new.css" rel="stylesheet" />
+    <link href="~/css/Login.css" rel="stylesheet" />
+      <link href="~/css/jquery-ui.css" rel="stylesheet" />
+        <link href="~/css/jquery.timepicker.min.css" rel="stylesheet" />
+       <link href="~/css/jquery-ui.theme.css" rel="stylesheet" />
+     <link href="~/css/open-iconic/font/css/open-iconic-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Json/data.json"/>
+     <script src="~/js/jquery.min.js"></script>
+     <script src="~/js/bootstrap.bundle.min.js"></script>
+       <script src="~/js/bootstrap.min.js"></script>
+        
+        <script src="~/js/jquery-ui.min.js"></script>
+        <script src="~/js/jquery.timepicker.min.js"></script>
+  <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+</script>
+<!--End of Tawk.to Script-->
+
+    <script src="~/js/jquery.cookie.js"></script>
+    <style>
+    .ui-timepicker-wrapper {
+ 
+    width: 30em !important;
+    background: #fff !important;
+  
+} 
+.scrollbar-auto::-webkit-scrollbar{
+   width:1px;
+}
+  .scrollbar-auto {
+       
+            background-color: transparent;
+           /* height: 150px;*/
+            width: 80rem;
+            overflow: scroll;
+        }
+</style>
+</head>
+<body style="background:url('/images/background1.png')">
+    <app>
+        @(await Html.RenderComponentAsync<App>(RenderMode.Server))
+    </app>
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script>
+      function loadControls(){
+          
+           $('.draggable').draggable();
+          $('.datepicker').datepicker({
+            dateFormat: 'dd/mm/yy'
+           });
+
+    $('.timepicker').timepicker({
+    interval: 60,
+    minTime: '12',
+    maxTime: '12:00 AM',
+    defaultTime: '12',
+    startTime: '11:00',
+    dynamic: true,
+    dropdown: true,
+    scrollbar: true
+    });
+}; 
+
+function ShowPaymentModal(){
+    $("#PaymentView").modal();
+}
+        window.AlertUsernamePassword = () => {
+            $("#LoginBtn").button().click(function () {
+                // alert("button");
+                //  alert($('input:text').val());
+                // alert($('input:password').val());
+                var username = $("#username").val();
+                var password = $("#password").val();
+                if (username == "") {
+                    alert("your username cannot be null");
+                } else if (password == "") {
+                    alert("your password cannot be null");
+                } else {
+                    auth(username, password);
+                }
+
+
+            });
+        }
+
+        function CallChatWidget(){
+
+            var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6251f8b67b967b1179899eca/1g08373qr';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+
+        }
+        
+        //authenticate function to make ajax call
+        function auth(username, password) {
+            var newData = {
+                "username": username,
+                "password": password,
+                "status": "login success!",
+            };
+            var dataJson = JSON.stringify(newData);
+           
+
+
+            $.ajax
+                ({
+                    type: "GET",
+                    //SEND TO MY SERVER URL
+                    url: '/Json/data.json',
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    async: true,
+                    data: {
+                        'username': username,
+                        "password": password
+                    },
+                    success: function (response) { //we got the response
+                        alert('Successfully called');
+                        $.each(response, function (name, value) {   
+                            if (JSON.stringify(value).includes("club")) {
+                                alert("successfully verified, you are one of clubs")
+                                alert(dataJson)
+                            }else if (JSON.stringify(value) == "user") {
+                                alert("successfully verified, you are one of users")
+                            }
+                            
+                        })
+                        window.location.href = 'https://localhost:5001';
+                    }
+
+                })
+        }
+
+
+    </script>
+</body>
+</html>

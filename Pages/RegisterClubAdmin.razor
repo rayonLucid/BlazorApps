@@ -1,0 +1,126 @@
+﻿@page "/RegisterClubAdmin"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+@layout NewLayout
+
+<div class="container-fluid">
+   
+   <form style="margin:1em 1em">
+
+    <div class="container-fluid" style="width:40rem;padding:2em">
+
+<h3 class="text-center">Club Admin's Information</h3>
+<hr class="text-black-50" style="border-bottom:0.2em black solid;margin-bottom:0.5em"/>
+
+    <div class="container-fluid">
+        <div class="row form-group">
+            <div class="col-md-6" style="display:none;">
+                 <label>User ID</label>
+        <input type="text" class=form-control id="userID" @bind="user.UserID" />
+
+            </div>
+               <div class="col-md-12">
+                    <label>Club name</label>
+        <input  readonly="readonly" class=form-control id="ClubID" @bind="clubsInfo.ClubName" />
+          
+               </div>
+        </div>
+        <div class="row form-group">
+              <div class="col-md-6">
+              <label>First name</label>
+        <input type="text" class=form-control id="FirstName" @bind="user.FirstName" />
+        </div>
+          <div class="col-md-6">
+                <label>Surname</label>
+        <input type="text" class=form-control id="Surname" @bind="user.LastName" />
+              
+          </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-6">
+                     <label>Email</label>
+        <input type="text" class=form-control id="Email" @bind="user.Email" />
+             
+        </div>
+         <div class="col-md-6">
+               <label>Phone Number</label>
+        <input type="text" class=form-control id="Phone" @bind="user.PhoneNumber" />
+         </div>
+        </div>
+         <div class="row form-group">
+              <label>Address</label>
+        <textarea  cols="5" rows="2" class=form-control id="Address" @bind="user.Address" />
+         </div> 
+         <div class="row form-group">
+              <div class="col-md-6">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" @bind="user.UserName" />
+             </div>
+             
+             <div class="col-md-6">
+                 <label>Password</label>
+        <input type="password" class=form-control id="Password" @bind="user.Password" />
+             </div>
+        </div>
+        <div class="row form-group" style="display:none">
+             <div class="col-md-6">
+               <label>Is Admin  <input type="checkbox" id="isAdmin" @bind="user.IsAdmin" style="transform:scale(2);margin:1em 1em" /></label>
+           </div>
+            <div class="col-md-6">
+               <label>Is Active  <input type="checkbox" id="isActive" @bind="user.IsActive" style="transform:scale(2);margin:1em 1em" /></label>
+           </div>
+        </div>
+         <div class="row form-group">
+             <button type="button" class="btn btn-block btn-primary" @onclick="() =>SaveUser(user)">Save User</button>
+        </div>
+    </div>
+
+</div>
+</form>
+</div>
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    IEnumerable<ClubInformation> Clubs { get; set; }
+
+    ClubInformation clubsInfo = new ClubInformation();
+    string userResult =string.Empty  ;
+    UserInformation user = new UserInformation();
+
+
+    public async void SaveUser(UserInformation loginuser)
+    {
+
+        if(loginuser.UserName.Length >0 && loginuser.Password.Length >0  ){
+            loginuser.ClubID = clubsInfo.ClubID;
+            loginuser.IsClubAdmin = true;
+            loginuser.UserID = userService.GetNewUserID();
+            loginuser.IsActive = true;
+            loginuser.IsClubAdmin = true;
+            loginuser.IsMember = false;
+            loginuser.IsAdmin = true;
+            userResult = userService.AddUser(loginuser);
+
+            if(!string.IsNullOrEmpty(userResult) && userResult=="Successfull"){ 
+                await JSRuntime.InvokeVoidAsync("alert","Record Successfully Created"); 
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert",userResult);
+            }
+        }
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var  clubid = await storage.GetAsync<string>("ClubID");
+        if (!string.IsNullOrEmpty(clubid.Value))
+        {
+                 clubsInfo=   await Task.Run(()=> userService.GetActiveClubsInfo(clubid.Value).FirstOrDefault());
+        }
+      
+    }
+
+}

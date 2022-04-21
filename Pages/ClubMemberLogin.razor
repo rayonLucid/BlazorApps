@@ -1,0 +1,508 @@
+﻿@page "/ClubMemberLogin"
+@using Club_Portal.Models
+@inject UserService userService
+@inject LoginService loginService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+@layout NewLayout
+<div class="container-fluid ">
+   
+
+      <form   style="margin:1em 1em">
+
+    <div class="container-fluid card" style="color:white;background-color:black;top:8rem;vertical-align:middle;width:40rem;padding:2em;border-radius:1rem">
+
+<h3 class="text-center">Member Login</h3>
+<hr class="text-black-50" style="border-bottom:0.2em black solid;margin-bottom:0.5em"/>
+
+    <div class="card-body">
+        
+       
+         <div class="row form-group">
+              <div class="col-md-12">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" @bind="userinfo.UserName" />
+             </div>
+             </div>
+               <div class="row form-group">
+             <div class="col-md-12">
+                 <label>Password</label>
+        <input type="password" class=form-control id="Password" @bind="userinfo.Password" />
+             </div>
+        </div>
+      
+         <div class="row form-group p-4">
+             <button type="button" class="btn btn-block btn-primary" @onclick="()=>LoginUser(userinfo)">Sign In</button>
+        </div>
+    </div>
+     <div class="row form-group p-3 text-center" style="text-align:center;margin:0 auto">
+          New User?  <button type="button" class="btn"  data-target="#editView" data-toggle="modal"   style="color:white;margin:0em 1em;padding:0">Sign Up</button>
+        </div>
+  </div>
+  </form>
+
+
+   @*Dialog for selecttion of Clubs*@
+  <div class="modal fade draggable"  id="clubSelection" role="dialog"  tabindex="-1"  aria-hidden="true">
+       <div class="modal-dialog" role="document">
+       <div class="modal-content" style="width:65em">
+               
+       <div class="modal-header">
+       <h3 class="modal-title">Select  Club</h3>
+       <button type="button" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+        </button>
+       </div>
+
+       <div class="modal-body">
+            @if (clubList != null )
+            {
+
+            <ul class="nav flex-row">
+                @foreach (var EachClub in clubList)
+                {
+                     // RandomColour(); 
+                    string clubid = @EachClub.ClubID;
+                     string ClubName = @EachClub.ClubName;
+                                <li class=" card nav-item px-3" style="width:40%;margin:0.1em 0.1em;width:stretch;background-color:rgb(5 22 60);color:white">
+                        <div class="card-body" style="width:stretch">
+
+                          
+                            <div class="row form-group">
+                                <label class="col-md-4" >Name</label>
+                                <label class="col-md-8" >@EachClub.ClubName</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Phone </label>
+                                <label class="col-md-8" >@EachClub.PhoneNumber</label>
+
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-md-4" >Email</label>
+                                <label class="col-md-8" >@EachClub.Email</label>
+
+                            </div>
+                           <div class="row form-group">
+                              
+                                <label class="col-md-12" >@EachClub.Description</label>
+
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    <input type="button" id="modalEditbutton" data-toggle="modal"   data-target="#editView" data-dismiss="modal"  @onclick="()=>EditUser(clubid,ClubName)"  value="Join" class="btn btn-block btn-warning" />
+                                </div>
+                               
+                            </div>
+                        </div>
+
+                    </li>
+                }
+            </ul>
+            <div class="card-footer">
+                @if (buttoncount != 0)
+                {
+                    <ul class="nav flex-row">
+
+                        @for (int x = 0; x <= @buttoncount; x++)
+                        {
+                           // RandomColour();
+                            int i = @x;
+                            int skip = i *6;
+                           
+                            if (i == 0)
+                            {
+                                <li class="nav-item " style="margin:auto 0.1em;background-color:@BackgroundColor">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip)">First</button>
+                                </li>
+                            }
+                            else if (@buttoncount==@x)
+                            {
+                                 <li class="nav-item " style="margin:auto 0.1em">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip)">Last</button>
+                                </li> 
+                            }
+                            else
+                            {
+                                 <li class="nav-item " style="margin:auto 0.1em">
+                                <button type="button" class="btn btn-outline-secondary" data-id=@x id=@x @onclick="() =>getRecord(skip)">@x</button>
+                            </li>
+                            }
+
+
+                        }
+
+                </ul>
+                }
+            </div>
+
+        }
+        else
+        {
+            <div><p>Loading...</p></div>
+        }
+       </div>
+      </div>
+     </div>
+    </div>
+    </div>
+
+   @* Member Payment*@
+
+   <div class="modal fade draggable scrollbar-auto" id="PaymentView" tabindex="-1" role="dialog" aria-hidden="true"> 
+   
+   <div class="modal-dialog " role="document">
+
+       <div class="modal-content" style="width:50rem">
+            <div class="modal-header">
+
+    <h5 class="modal-title">Payment Information</h5>
+    <button type="button" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+    </button>
+  
+
+   </div>
+    <div class="modal-body" >
+        <div class="card-body" style="width:stretch">
+           
+             <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card ">
+                <div class="card-header">
+                    <div class="bg-white shadow-sm pt-4 pl-2 pr-2 pb-2">
+                        <!-- Credit card form tabs -->
+                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
+                            <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <img src="https://img.icons8.com/color/25/000000/bank-cards.png" /> Credit Card </a> </li>
+                            <li class="nav-item"> <a data-toggle="pill" href="#paypal" class="nav-link "> <img src="https://img.icons8.com/color/28/000000/paypal.png" /> Paypal </a> </li>
+                            <li class="nav-item"> <a data-toggle="pill" href="#net-banking" class="nav-link "> <img src="https://img.icons8.com/color/28/000000/mobile-payment.png" /> Net Banking </a> </li>
+                        </ul>
+                    </div> <!-- End -->
+                    <!-- Credit card form content -->
+                    <div class="tab-content">
+                        <!-- credit card info-->
+                        <div id="credit-card" class="tab-pane fade show active pt-3">
+                            <form role="form" onsubmit="event.preventDefault()">
+                               
+                                <div class="form-group">
+                                    <label for="cardNumber">
+                                        <label>Card number</label>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" @bind="paymentinfo.Cardnumber" placeholder="Valid card number" class="form-control " required>
+                                        <div class="input-group-append"> <span class="input-group-text text-muted"><img src="https://img.icons8.com/color/24/000000/visa.png" /> <img src="https://img.icons8.com/color/24/000000/mastercard.png" /> <img src="https://img.icons8.com/color/28/000000/amex.png" /> </span> </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label>
+                                                <span class="hidden-xs">
+                                                    <label>Expiration Date</label>
+                                                </span>
+                                            </label>
+                                            <div class="input-group"> 
+                                                <input type="number" max="2" placeholder="MM" @bind="paymentinfo.MonthOfExpiration" class="form-control" required>
+                                                <input type="number" max="2" placeholder="YY" @bind="paymentinfo.YearOfExpiration" class="form-control" required> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group mb-4">
+                                            <label data-toggle="tooltip" title="Three digit CV code on the back of your card">
+                                                <label>CVV <i class="fa fa-question-circle d-inline"></i></label>
+                                            </label> <input type="text" maxlength="3" @bind="paymentinfo.Cvv" required class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="form-group row">
+                                    <label for="username">
+                                        <label>Amount</label>
+                                    </label> <input type="number" min="100" @bind="paymentinfo.TotalAmount" required class="form-control ">
+                                </div>
+                                <div class="card-footer" />
+                                <button type="button" class="subscribe btn btn-primary btn-block shadow-sm"  @onclick="() =>MakePayment(paymentinfo)"> Confirm Payment </button>
+                            </form>
+                        </div>
+                    </div> <!-- End -->
+                    <!-- Paypal info -->
+                    <div id="paypal" class="tab-pane fade pt-3">
+                        <label class="pb-2">Select your paypal account type</label>
+                        <div class="form-group "> <label class="radio-inline"> <input type="radio" name="optradio" checked> Domestic </label> <label class="radio-inline"> <input type="radio" name="optradio" class="ml-5">International </label></div>
+                        <p> <button type="button" class="btn btn-primary "><i class="fab fa-paypal mr-2"></i> Log into my Paypal</button> </p>
+                        <p class="text-muted"> Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                    </div> <!-- End -->
+                    <!-- bank transfer info -->
+                    <div id="net-banking" class="tab-pane fade pt-3">
+                        <div class="form-group ">
+                            <label for="Select Your Bank">
+                                <h5>Select your Bank</h5>
+                            </label> <select class="form-control" id="ccmonth">
+                                <option value="" selected disabled>--Please select your Bank--</option>
+                                <option>Bank 1</option>
+                                <option>Bank 2</option>
+                                <option>Bank 3</option>
+                                <option>Bank 4</option>
+                                <option>Bank 5</option>
+                                <option>Bank 6</option>
+                                <option>Bank 7</option>
+                                <option>Bank 8</option>
+                                <option>Bank 9</option>
+                                <option>Bank 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i> Proceed Payment</button> </p>
+                        </div>
+                        <p class="text-muted">Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                    </div> <!-- End -->
+                    <!-- End -->
+                </div>
+            </div>
+        </div>
+    </div>
+                
+          
+           
+        </div>
+       
+                
+            </div>
+   </div>
+   <div class="modal-footer">
+       <button class="btn btn-primary btn-outline-warning" data-dismiss="modal" >Pay</button>
+   </div>
+   </div>
+   </div>
+ 
+   @* Member Form*@
+
+<div class="modal fade draggable" id="editView" tabindex="-1" role="dialog" aria-hidden="true"> 
+   
+   <div class="modal-dialog " role="document">
+
+       <div class="modal-content bg-primary" style="width:fit-content">
+            <div class="modal-header">
+
+    <h5 class="modal-title">Member Information</h5>
+    <button type="button" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+    </button>
+  
+
+   </div>
+    <div class="modal-body" >
+        <div class="card-body" style="width:stretch">
+            <div class ="row form-group">
+                <div class="col-md-6">
+                    <label>First Name</label>
+                <input @bind="userinfo.FirstName" class="form-control" />
+                </div>
+                 <div class="col-md-6">
+                     <label>Last Name</label>
+                <input @bind="userinfo.LastName" class="form-control" />
+                 </div>
+                
+            </div>
+            <div class ="row form-group">
+                <label>Club Name</label>
+                <input readonly="readonly" @bind="@ClubName" class="form-control" />
+            </div>
+             <div class ="row form-group">
+                <label>Phone</label>
+                <input @bind="userinfo.PhoneNumber" class="form-control" />
+            </div>
+             <div class ="row form-group">
+                <label>Email</label>
+                <input @bind="userinfo.Email" class="form-control" />
+            </div>
+             <div class ="row form-group">
+         <label>Address</label>
+                <textarea @bind="userinfo.Address" class="form-control" />
+            </div>
+        </div>
+         <div class ="row form-group">
+                <div class="col-md-6">
+                    <label>User Name</label>
+                <input @bind="userinfo.UserName" class="form-control" />
+                </div>
+                 <div class="col-md-6">
+                     <label>Password</label>
+                <input @bind="userinfo.Password" autocomplete="off" class="form-control" />
+                 </div>
+                
+            </div>
+   </div>
+   <div class="modal-footer">
+       <button class="btn btn-primary btn-outline-warning" data-dismiss="modal" @onclick="(async() => await  SaveUser(userinfo))">Save</button>
+   </div>
+   </div>
+   </div>
+</div>
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    ClubInformation clubs = new ClubInformation();
+    Pay paymentinfo = new Pay();
+    UserInformation userinfo = new UserInformation();
+    int clubcount ;
+    IEnumerable<UserInformation> userList;
+    IEnumerable<ClubInformation> clubList;
+    int clubCount = 0;
+    int buttoncount = 0;
+    string ClubName;
+    string ClubID;
+    private string BackgroundColor="transparent";
+    protected override async Task OnInitializedAsync()
+    {
+
+        clubList =  await Task.Run(()=> userService.GetAllClubs());
+        clubCount = clubList.Count();
+        buttoncount = clubCount / 6;
+
+        clubList =  userService.GetClubs(0);
+
+    }
+
+    private async Task<string> MakePayment(Pay payinfo){
+        var UserID =await   storage.GetAsync<string>("UserID");
+        payinfo.UserID = UserID.Value;
+        payinfo.PaymentDate = DateTime.Now;
+        payinfo.NARRATION = "Payment to Portal"; 
+        Random randomRef = new Random();
+        int Payref =  randomRef.Next(100000,10000000);
+        payinfo.PaymentRef = "REF-" + Payref.ToString();
+        payinfo.PaymentId = payinfo.PaymentRef+"/"+DateTime.Now.ToShortTimeString();
+        string result =   userService.AddPayment(payinfo);
+        if (result == "Successfull")
+        {
+            userinfo.UserID = UserID.Value;
+            userinfo.IsActive = true;
+            userService.AddUser(userinfo);
+          await JSRuntime.InvokeVoidAsync("alert","Payment Successfull");
+           NavigationManager.NavigateTo("/MembersDashBoard");
+        
+        }
+        return result;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            await JSRuntime.InvokeVoidAsync("loadControls");
+
+
+
+            StateHasChanged();
+        }
+        base.OnAfterRender(firstRender);
+    }
+    private async Task LoginUser(UserInformation info){
+        if (info.UserName.Length > 0 && info.Password.Length > 0)
+        {
+
+            userinfo = loginService.ValidateUser(info).FirstOrDefault();
+            if (userinfo != null)
+            {
+
+                if (!userinfo.IsActive)
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", " User has been deactivated");
+                    return;
+                } else
+                {
+                    await  storage.SetAsync("UserID", userinfo.UserID);
+                    await  storage.SetAsync("ClubID", userinfo.ClubID);
+                    await  storage.SetAsync("UserName", userinfo.UserName);
+
+                    NavigationManager.NavigateTo("/MembersDashBoard");
+                }
+            }
+        }
+
+    }
+    protected async Task RemoveUser(string userID)
+    {
+        bool deleted = false;
+        deleted =  await Task.Run(()=> userService.DeleteUser(userID));
+        if (deleted)
+        {
+            await JSRuntime.InvokeVoidAsync("alert","Record Successfully Deleted"); 
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert","Record Not Deleted"); 
+        }
+    }
+    private void getRecord(int value)
+    {
+        clubList =  userService.GetClubs(value);
+        clubcount = clubList.Count();
+    }
+    private void getPreviousRecord()
+    {
+        clubList =  userService.GetAllClubs();
+    }
+    private void getNextRecord()
+    {
+        clubList = userService.GetNextClubs();
+        StateHasChanged();
+    }
+    protected void RandomColour()
+
+    {
+
+        var random = new Random();
+
+        var color = String.Format("#{0:X6}", random.Next(0x1000000));
+
+        BackgroundColor = color;
+
+    }
+
+   
+    private async  Task SaveUser(UserInformation userInformation)
+    {
+        userInformation.ClubID = ClubID;
+        userInformation.IsMember = true;
+        userInformation.IsClubAdmin = false;
+        userInformation.IsActive = false;
+        string NewUserID =   userService.GetNewUserID();
+        userInformation.UserID = NewUserID;
+        string result =   userService.AddUser(userInformation);
+        if(result == "Successfull")
+        {
+             await  storage.SetAsync("UserID", userInformation.UserID);
+                   await  storage.SetAsync("ClubID", userInformation.ClubID);
+                    await  storage.SetAsync("UserName", userInformation.UserName);
+                      await JSRuntime.InvokeVoidAsync("ShowPaymentModal");
+         //   await JSRuntime.InvokeVoidAsync("alert","Record Successfully Created");
+          //  NavigationManager.NavigateTo("/MembersDashBoard");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert",result);
+        }
+
+    }
+    async Task<bool> EditUser(string clubid,string Clubname)
+    {
+        bool result = true;
+        await  storage.SetAsync("vClubname",ClubName);
+        await  storage.SetAsync("vClubid",clubid);
+        ClubName = Clubname;
+        ClubID = clubid;
+        // clubs =   userService.GetActiveClubsInfo(clubid).FirstOrDefault();
+        //if (clubs != null)
+        //{
+
+        //    result = true; 
+        //}
+        return result;
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("Users");
+    }
+}

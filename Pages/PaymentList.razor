@@ -1,0 +1,67 @@
+﻿@page "/PaymentList"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+
+
+<div class="form-group">
+   <h4>Payment List</h4>
+    <table class="table table-hover table-light">
+        <thead class="bg-primary">
+            <tr>
+                <th>Ref</th>
+             
+            
+                <th>Payment ID</th>
+              <th>Payment Date</th>
+                <th>User Name</th>
+           
+               <th>Narration</th>
+            
+             <th>Amount Paid</th>
+              <th></th>
+               <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+               
+                <td>@user.FirstName</td>
+            
+               
+                <td>@user.Address</td>
+           
+               
+                <td>@user.PhoneNumber</td>
+           
+               
+                <td>@user.Email</td>
+           
+                
+                <td>@user.IsActive</td>
+              @*  <td> @if (user.FirstName!="Master") {<input type="submit" value="Delete" @onclick="(async () => await RemoveUser(user.UserID))" class="btn btn-danger" />
+                    }
+                </td>
+                <td>  <input type="submit" value="Cancel" @onclick="(() => Cancel())" class="btn btn-warning" /></td>*@
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+   
+   
+</div>
+
+@code {
+   [Inject] IJSRuntime JSRuntime { get; set; }
+     UserInformation user = new UserInformation();
+    IEnumerable<UserInformation> userList;
+    protected override async Task OnInitializedAsync()
+    {
+          var  username = await storage.GetAsync<string>("UserName");
+            var  clubid = await storage.GetAsync<string>("UserID");
+        user =  await Task.Run(()=> userService.GetAllUsers(clubid.Value,username.Value).FirstOrDefault());
+        
+    }
+}

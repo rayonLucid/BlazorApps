@@ -1,0 +1,117 @@
+﻿@page "/Users"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+<div class="row form-group">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+              <NavLink class="nav-link" href="UserList" Match="NavLinkMatch.All">
+                <span class="oi  oi-list-rich" aria-hidden="true"></span> View User List
+            </NavLink>
+           
+        </li>
+    </ul>
+</div>
+<h3 class="text-center">User's Information</h3>
+<hr class="text-black-50" style="border-bottom:0.2em black solid;margin-bottom:0.5em"/>
+<form>
+    <div class="container-fluid">
+        <div class="row form-group">
+            <div class="col-md-6">
+                 <label>User ID</label>
+        <input type="text" class=form-control id="userID" @bind="user.UserID" />
+
+            </div>
+               <div class="col-md-6">
+                    <label>Club name</label>
+        <select  class=form-control id="ClubID" @bind="user.ClubID" >
+            <option>--Select Club Name--</option>
+                @if(Clubs == null)  
+{  
+<p>  
+    <em>Loading ...</em>  
+</p>  
+}  else{
+                                        @foreach(var clubs in  Clubs)
+                                        {
+                                              <option value="@clubs.ClubID" >@clubs.ClubName</option>
+                                        }
+}
+            </select>
+               </div>
+        </div>
+        <div class="row form-group">
+              <div class="col-md-6">
+              <label>First name</label>
+        <input type="text" class=form-control id="FirstName" @bind="user.FirstName" />
+        </div>
+          <div class="col-md-6">
+                <label>Surname</label>
+        <input type="text" class=form-control id="Surname" @bind="user.LastName" />
+              
+          </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-6">
+                     <label>Email</label>
+        <input type="text" class=form-control id="Email" @bind="user.Email" />
+             
+        </div>
+         <div class="col-md-6">
+               <label>Phone Number</label>
+        <input type="text" class=form-control id="Phone" @bind="user.PhoneNumber" />
+         </div>
+        </div>
+         <div class="row form-group">
+              <label>Address</label>
+        <textarea  cols="5" rows="2" class=form-control id="Address" @bind="user.Address" />
+         </div> 
+         <div class="row form-group">
+              <div class="col-md-6">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" @bind="user.UserName" />
+             </div>
+             
+             <div class="col-md-6">
+                 <label>Password</label>
+        <input type="password" class=form-control id="Password" @bind="user.Password" />
+             </div>
+        </div>
+        <div class="row form-group">
+             <div class="col-md-6">
+               <label>Is Admin  <input type="checkbox" id="isAdmin" @bind="user.IsAdmin" style="transform:scale(2);margin:1em 1em" /></label>
+           </div>
+            <div class="col-md-6">
+               <label>Is Active  <input type="checkbox" id="isActive" @bind="user.IsActive" style="transform:scale(2);margin:1em 1em" /></label>
+           </div>
+        </div>
+         <div class="row form-group">
+             <button type="button" class="btn btn-block btn-primary" @onclick="() =>SaveUser(user)">Save User</button>
+        </div>
+    </div>
+</form>
+@code {
+      [Inject] IJSRuntime JSRuntime { get; set; }
+    IEnumerable<ClubInformation> Clubs { get; set; }
+    string userResult =string.Empty  ;
+    UserInformation user = new UserInformation();
+    public async void SaveUser(UserInformation loginuser)
+    {
+        if(loginuser.UserName.Length >0 && loginuser.Password.Length >0  ){
+            userResult = userService.AddUser(loginuser);
+
+            if(!string.IsNullOrEmpty(userResult) && userResult=="Successfull"){ 
+               await JSRuntime.InvokeVoidAsync("alert","Record Successfully Created"); 
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert",userResult);
+            }
+        }
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        Clubs =   await Task.Run(()=> userService.GetAllClubs());
+    }
+}

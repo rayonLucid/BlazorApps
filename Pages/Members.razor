@@ -1,0 +1,180 @@
+﻿@page "/Members"
+@using Club_Portal.Models
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage
+
+<div class="row form-group">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+              <button type="button"  data-toggle="modal" data-target="#MemberListView" class="btn-link btn">
+                <span class="oi  oi-list-rich" aria-hidden="true"></span> View Members List
+            </button>
+           
+        </li>
+    </ul>
+</div>
+<h3 class="text-center">Member's Information</h3>
+<hr class="text-black-50" style="border-bottom:0.2em black solid;margin-bottom:0.5em"/>
+<form>
+    <div class="container-fluid" style="width:fit-content;elevation:above;box-sizing:border-box">
+        <div class="row form-group">
+            <div class="col-md-12" style="display:none;">
+                 <label>User ID</label>
+        <input type="text" class=form-control disabled="@IsDisabled" id="userID" @bind="user.UserID" />
+            </div>
+              
+        </div>
+        <div class="row form-group">
+              <div class="col-md-6">
+              <label>First name</label>
+        <input type="text" class=form-control id="FirstName" @bind="user.FirstName" />
+        </div>
+          <div class="col-md-6">
+                <label>Surname</label>
+        <input type="text" class=form-control id="Surname" @bind="user.LastName" />
+              
+          </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-6">
+                     <label>Email</label>
+        <input type="text" class=form-control id="Email" @bind="user.Email" />
+             
+        </div>
+         <div class="col-md-6">
+               <label>Phone Number</label>
+        <input type="text" class=form-control id="Phone" @bind="user.PhoneNumber" />
+         </div>
+        </div>
+         <div class="row form-group">
+              <div class="col-md-6">
+                 <label>User name</label>
+        <input type="text" class=form-control id="UserName" @bind="user.UserName" />
+             </div>
+             
+             <div class="col-md-6">
+                 <label>Password</label>
+        <input type="password" class=form-control id="Password" @bind="user.Password" />
+             </div>
+        </div>
+        <div class="row form-group">
+             <div class="col-md-6">
+               <label style="display:none;">Is Admin  <input type="checkbox"  id="isAdmin" @bind="user.IsAdmin" style="transform:scale(2);margin:1em 1em" /></label>
+           </div>
+            <div class="col-md-6">
+               <label>Is Active  <input type="checkbox" id="isActive" @bind="user.IsActive" style="transform:scale(2);margin:1em 1em" /></label>
+           </div>
+        </div>
+         <div class="row form-group">
+             <button type="button" class="btn btn-block btn-primary" @onclick="() =>SaveUser(user)">Save</button>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="MemberListView" tabindex="-1" role="dialog" aria-hidden="true"> 
+   
+   <div class="modal-dialog " role="document">
+
+       <div class="modal-content" style="width:50rem" >
+            <div class="modal-header" style="background-color:aliceblue">
+
+    <h5 class="modal-title">Members Information List</h5>
+    <button type="button" @onclick="(async()=>await LoadMembers())" class=close data-dismiss="modal" aria-label="close">
+        <span aria-hidden="true">&times</span>
+    </button>
+  
+
+   </div>
+    <div class="modal-body table-responsive" >
+        <div class="card-body " >
+           <table class="table table-bordered">
+               <thead style="background-color:Highlight">
+                   <tr>
+                       <th>Name</th>
+                        <th>Phone</th>
+                         <th>Email</th>
+                          <th> Active</th>
+                           <th> Admin</th>
+                           <th></th>
+                   </tr>
+               </thead>
+                @if (userlist != null )
+            {
+               <tbody>
+                    @foreach (var EachUser in userlist)
+                {
+                                    string userid = EachUser.UserID;
+                                    <tr>
+                       <td>@EachUser.FirstName  @EachUser.LastName</td>
+                        <td>@EachUser.PhoneNumber</td>
+                         <td>@EachUser.Email</td>
+                          <td>@EachUser.IsActive</td>
+                            <td>@EachUser.IsClubAdmin</td>
+                          <td>
+                               <input type="button" id="modalEditbutton"  data-dismiss="modal"  @onclick="()=>EditUser(userid)"  value="Edit" class="btn btn-warning" />
+                            
+                          </td>
+                   </tr>
+                }
+               </tbody>
+            }
+           </table>
+        </div>
+
+   </div>
+   <div class="modal-footer">
+       
+   </div>
+   </div>
+   </div>
+</div>
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    IEnumerable<UserInformation> userlist { get; set; }
+    string userResult =string.Empty  ;
+    string ClubName =string.Empty  ;
+    bool IsDisabled = false;
+    UserInformation user = new UserInformation();
+    public async void SaveUser(UserInformation loginuser)
+    {
+        if(loginuser.UserName.Length >0 && loginuser.Password.Length >0  ){
+            var  clubid = await  storage.GetAsync<string>("ClubID");
+            loginuser.IsClubAdmin = false;
+            loginuser.IsMember = true;
+            loginuser.ClubID = clubid.Value;
+            if(loginuser.UserID == null)
+            {
+                loginuser.UserID = userService.GetNewUserID();
+            }
+            userResult = userService.AddUser(loginuser);
+            if(!string.IsNullOrEmpty(userResult) && userResult=="Successfull"){ 
+                await JSRuntime.InvokeVoidAsync("alert","Record Successfully Created"); 
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert",userResult);
+            }
+        }
+    }
+    private void EditUser(string userid)
+    {
+        IsDisabled = true;
+        user =   userService.GetUserData(userid).FirstOrDefault();
+    }
+    private async Task LoadMembers()
+    {
+         var  clubnameid = await  storage.GetAsync<string>("ClubName");
+          var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        userlist =   await Task.Run(()=> userService.GetAllMembers(clubid.Value));
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        var  clubnameid = await  storage.GetAsync<string>("ClubName");
+          var  clubid = await  storage.GetAsync<string>("ClubID");
+        ClubName = clubnameid.Value;
+        userlist =   await Task.Run(()=> userService.GetAllMembers(clubid.Value));
+    }
+}
+

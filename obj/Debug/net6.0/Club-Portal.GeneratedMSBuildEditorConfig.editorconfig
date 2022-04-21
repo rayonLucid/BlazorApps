@@ -1,0 +1,120 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = Club_Portal
+build_property.RootNamespace = Club_Portal
+build_property.ProjectDir = c:\Users\Tekn0Hub PC1\Documents\Raymond\Club-Portal\Club-Portal\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = c:\Users\Tekn0Hub PC1\Documents\Raymond\Club-Portal\Club-Portal
+build_property._RazorSourceGeneratorDebug = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/ClubList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2x1Ykxpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/ClubMemberLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2x1Yk1lbWJlckxvZ2luLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Clubs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2x1YnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/EventInformation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXZlbnRJbmZvcm1hdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Members.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVtYmVycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/MembersDashBoard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVtYmVyc0Rhc2hCb2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/MembersList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVtYmVyc0xpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/MyEvents.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTXlFdmVudHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/PaymentList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudExpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/PaymentProcessing.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFByb2Nlc3NpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/RegisterClubAdmin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXJDbHViQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/SubScribedEvents.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3ViU2NyaWJlZEV2ZW50cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/UserList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckxpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Shared/NewLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5ld0xheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Shared/UserLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFVzZXJMYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Shared/UserNavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFVzZXJOYXZNZW51LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[c:/Users/Tekn0Hub PC1/Documents/Raymond/Club-Portal/Club-Portal/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 

@@ -1,0 +1,38 @@
+﻿.login_bg {
+    position: absolute;
+    height: 100vh;
+    z-index: 0; 
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+   /* opacity: 0.8;*/
+}
+.username_color{
+      color: white;
+}
+.username_password_width{
+    width: auto;
+}
+
+
+.login_form{
+    justify-content:center;
+    height: 100vh;
+    display: flex;  
+    flex-direction:column; 
+    align-items: center;
+    
+}
+.login_card{
+    padding: 2% 5%;
+    border-top-style:dotted;
+    border-right-style:solid;
+    border-bottom-style:dotted;
+    border-left-style:solid; 
+    border-left-width: 10px;
+    border-right-width: 10px; 
+    border-radius: 20px;
+}
+
+
+
